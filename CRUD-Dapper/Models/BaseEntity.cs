@@ -2,7 +2,7 @@
 {
     public class BaseEntity
     {
-        public int Id { get; set; }
+        public int id { get; set; }
 
         public DateTime CreatedDate { get; set; }
 

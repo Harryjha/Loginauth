@@ -21,7 +21,7 @@ namespace CRUD_Dapper.Repository
             }
         }
 
-        public async Task<T> GetById(string tableName, Int64 id)
+        public async Task<T> GetById(string tableName, int id)
         {
             using (var connection = _context.CreateConnection())
             {
@@ -30,7 +30,7 @@ namespace CRUD_Dapper.Repository
             }
         }
 
-        public async Task Delete(string tableName, Int64 id)
+        public async Task Delete(string tableName, int id)
         {
             using (var connection = _context.CreateConnection())
             {
@@ -68,22 +68,56 @@ namespace CRUD_Dapper.Repository
             }
         }
 
+        //public async Task Update(string _TableName, T _Entity)
+        //{
+        //    using (var connection = _context.CreateConnection())
+        //    {
+        //        var _EntityTypeOf = typeof(T);
+        //        var _GetProperties = _EntityTypeOf.GetProperties().Where(x => x.Name != "Id");
+        //        DynamicParameters _DynamicParameters = new();
+        //        foreach (var property in _GetProperties)
+        //        {
+        //            var value = property.GetValue(_Entity);
+        //            _DynamicParameters.Add("@" + property.Name, value);
+        //        }
+        //        var idProperty = _EntityTypeOf.GetProperty("Id");
+        //        if (idProperty != null)
+        //        {
+        //            string updateQuery = $"UPDATE {_TableName} SET {string.Join(", ", _GetProperties.Select(p => p.Name + " = @" + p.Name))} WHERE Id = @Id";
+
+
+        //            await connection.ExecuteAsync(updateQuery, _DynamicParameters);
+        //        }
+        //        else
+        //        {
+        //            throw new ArgumentException("Entity must have an 'Id' property.");
+        //        }
+        //    }
+        //}
+
         public async Task Update(string _TableName, T _Entity)
         {
             using (var connection = _context.CreateConnection())
             {
                 var _EntityTypeOf = typeof(T);
-                var _GetProperties = _EntityTypeOf.GetProperties().Where(x => x.Name != "Id");
+                var _GetProperties = _EntityTypeOf.GetProperties();
                 DynamicParameters _DynamicParameters = new();
+
                 foreach (var property in _GetProperties)
                 {
                     var value = property.GetValue(_Entity);
                     _DynamicParameters.Add("@" + property.Name, value);
                 }
-                var idProperty = _EntityTypeOf.GetProperty("Id");
+
+                //var idProperty = _EntityTypeOf.GetProperty("id");
+                var idProperty = _EntityTypeOf.GetProperty("id") ?? _EntityTypeOf.BaseType.GetProperty("Id");
                 if (idProperty != null)
                 {
-                    string updateQuery = $"UPDATE {_TableName} SET {string.Join(", ", _GetProperties.Select(p => p.Name + " = @" + p.Name))} WHERE Id = @Id";
+                    string updateQuery = $@"UPDATE [{_TableName}] 
+                            SET {string.Join(", ", _GetProperties
+                                                    .Where(p => p.Name != "id")
+                                                    .Select(p => p.Name + " = @" + p.Name))} 
+                            WHERE id = @id";
                     await connection.ExecuteAsync(updateQuery, _DynamicParameters);
                 }
                 else
@@ -92,9 +126,5 @@ namespace CRUD_Dapper.Repository
                 }
             }
         }
-
-
-
-
     }
 }

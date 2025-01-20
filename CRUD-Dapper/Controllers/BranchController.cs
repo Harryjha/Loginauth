@@ -20,7 +20,7 @@ namespace CRUD_Dapper.Controllers
             return View(result);
         }
 
-        public async Task<IActionResult> Details(Int64 id)
+        public async Task<IActionResult> Details(int id)
         {
             var result = await _iGenericRepository.GetById("Branch", id);
             return View(result);
@@ -59,7 +59,7 @@ namespace CRUD_Dapper.Controllers
             {
                 try
                 {
-                    branch.Id = id;
+                    branch.id = id;
                     branch.UpdatedDate = DateTime.Now;
                     await _iGenericRepository.Update("Branch", branch);
                 }
@@ -78,7 +78,7 @@ namespace CRUD_Dapper.Controllers
         }
 
         [HttpDelete, ActionName("DeleteConfirmed")]
-        public async Task<IActionResult> DeleteConfirmed(Int64 id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _iGenericRepository.Delete("Branch", id);
             return RedirectToAction(nameof(Index));
