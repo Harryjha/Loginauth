@@ -45,7 +45,7 @@ namespace CRUD_Dapper.Controllers
             }
             return View(branch);
         }
-        public async Task<IActionResult> Edit(Int64 id)
+        public async Task<IActionResult> Edit(int id)
         {
             var _Branch = await _iGenericRepository.GetById("Branch", id);
             return View(_Branch);
@@ -53,7 +53,7 @@ namespace CRUD_Dapper.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, Branch branch)
+        public async Task<IActionResult> Edit(int id, Branch branch)
         {
             if (ModelState.IsValid)
             {
@@ -71,7 +71,7 @@ namespace CRUD_Dapper.Controllers
             }
             return View(branch);
         }
-        public async Task<IActionResult> Delete(Int64 id)
+        public async Task<IActionResult> Delete(int id)
         {
             var _Branch = await _iGenericRepository.GetById("Branch", id);
             return View(_Branch);

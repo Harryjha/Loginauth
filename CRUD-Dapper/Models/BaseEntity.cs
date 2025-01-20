@@ -6,6 +6,6 @@
 
         public DateTime CreatedDate { get; set; }
 
-        public DateTime? UpdaedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
     }
 }
