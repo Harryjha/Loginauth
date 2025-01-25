@@ -38,7 +38,7 @@ namespace CRUD_Dapper.Controllers
             if (ModelState.IsValid)
             {
                 branch.CreatedDate = DateTime.Now;
-                branch.UpdatedDate = DateTime.Now;
+               
                 await _iGenericRepository.Add("Branch", branch);
 
                 return RedirectToAction(nameof(Index));
@@ -60,7 +60,7 @@ namespace CRUD_Dapper.Controllers
                 try
                 {
                     branch.id = id;
-                    branch.UpdatedDate = DateTime.Now;
+                   
                     await _iGenericRepository.Update("Branch", branch);
                 }
                 catch (Exception)

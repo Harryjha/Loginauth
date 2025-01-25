@@ -105,5 +105,14 @@ namespace CRUD_Dapper.Repository
                 }
             }
         }
+        public async Task<T> GetByEmail(string tableName, string email)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                string query = $"SELECT * FROM {tableName} WHERE Email = @Email";
+                return await connection.QuerySingleOrDefaultAsync<T>(query, new { Email = email });
+            }
+        }
+
     }
 }

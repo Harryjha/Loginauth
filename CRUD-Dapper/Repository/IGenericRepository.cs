@@ -7,5 +7,7 @@
         Task Delete(string tableName, int id);
         Task Add(string tableName, T entity);
         Task Update(string tableName, T entity);
+        Task<T> GetByEmail(string tableName, string email);
+
     }
 }
