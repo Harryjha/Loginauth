@@ -15,6 +15,9 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Required for GDPR compliance
 });
 
+// Register IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+
 // Dependency Injection
 builder.Services.AddTransient<IDapperContext, DapperContext>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
