@@ -1,0 +1,24 @@
+﻿@model IEnumerable<CRUD_Dapper.Models.Destination>
+
+@{
+    ViewData["Title"] = "Available Destinations";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Available Destinations for Booking</h2>
+    <div class="row">
+        @foreach (var destination in Model)
+        {
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="@destination.ImageUrl" class="card-img-top" alt="@destination.Name">
+                    <div class="card-body">
+                        <h5 class="card-title">@destination.Name</h5>
+                        <p class="card-text">@destination.Description</p>
+                        <a href="#" class="btn btn-success">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

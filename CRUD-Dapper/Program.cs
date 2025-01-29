@@ -1,5 +1,7 @@
-using CRUD_Dapper.Data;
+﻿using CRUD_Dapper.Data;
 using CRUD_Dapper.Repository;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Session;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
-// Add session management
+// ✅ Add session management
+builder.Services.AddDistributedMemoryCache(); // Required for session storage
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout duration
@@ -15,12 +18,15 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Required for GDPR compliance
 });
 
-// Register IHttpContextAccessor
+// ✅ Register IHttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
-// Dependency Injection
+// ✅ Dependency Injection
 builder.Services.AddTransient<IDapperContext, DapperContext>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+// ✅ Register `IDestinationRepository` (Fixes the error)
+builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
 
 var app = builder.Build();
 
@@ -36,7 +42,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Add session middleware
+// ✅ Enable session middleware  
 app.UseSession();
 
 app.UseAuthorization();
