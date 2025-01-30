@@ -6,6 +6,8 @@
 
 <div class="container mt-5">
     <h2 class="text-center mb-4">Available Destinations for Booking</h2>
+    <a asp-action="CreateDestination" class="btn btn-success">Add New Destination</a>
+
     <div class="row">
         @foreach (var destination in Model)
         {

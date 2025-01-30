@@ -23,10 +23,30 @@ namespace CRUD_Dapper.Controllers
             return View();
         }
 
+        // GET: /Home/Destinations
         public async Task<IActionResult> Destinations()
         {
             var destinations = await _destinationRepository.GetAllDestinations();
-            return View(destinations); // Ensure this matches your view name
+            return View(destinations); // Ensure a "Destinations.cshtml" view exists
+        }
+
+        // ? GET: Show Create Destination Form
+        public IActionResult CreateDestination()
+        {
+            return View(); // Ensure "CreateDestination.cshtml" exists
+        }
+
+        // ? POST: Submit Form Data
+        [HttpPost]
+        public async Task<IActionResult> CreateDestination(Destination model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            await _destinationRepository.AddDestination(model);
+            return RedirectToAction("Destinations"); // Redirect to the list after adding
         }
 
         public IActionResult Privacy()
@@ -39,5 +59,5 @@ namespace CRUD_Dapper.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-    } 
-} 
+    }
+}
