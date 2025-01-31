@@ -1,38 +1,26 @@
 ﻿using CRUD_Dapper.Data;
 using CRUD_Dapper.Repository;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Session;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
 
-
-// ✅ Add session management
-builder.Services.AddDistributedMemoryCache(); // Required for session storage
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout duration
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true; // Required for GDPR compliance
+    options.Cookie.IsEssential = true;
 });
 
-// ✅ Register IHttpContextAccessor
 builder.Services.AddHttpContextAccessor();
-
-// ✅ Dependency Injection
 builder.Services.AddTransient<IDapperContext, DapperContext>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-// ✅ Register `IDestinationRepository` (Fixes the error)
-builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -41,12 +29,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-// ✅ Enable session middleware  
 app.UseSession();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -54,3 +38,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+

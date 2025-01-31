@@ -54,15 +54,12 @@ namespace CRUD_Dapper.Repository
                     _DynamicParameters.Add("@" + property.Name, value);
                 }
 
-                var idProperty = _EntityTypeOf.GetProperty("id");
+                var idProperty = _EntityTypeOf.GetProperty("Id");
                 if (idProperty != null)
                 {
-                    //string insertQuery = $"INSERT INTO {_TableName} ({string.Join(", ", _GetProperties.Select(p => p.Name))}) "
-                    //        + $"VALUES ({string.Join(", ", _GetProperties.Select(p => "@" + p.Name))})";
-
-                    string insertQuery = $"INSERT INTO {_TableName} ({string.Join(", ", _GetProperties.Where(p => p.Name != "id").Select(p => p.Name))}) "
-             + $"VALUES ({string.Join(", ", _GetProperties.Where(p => p.Name != "id").Select(p => "@" + p.Name))})";
-
+                    // ✅ No need for "p.Name != "id"" here since _GetProperties already excludes "Id"
+                    string insertQuery = $"INSERT INTO {_TableName} ({string.Join(", ", _GetProperties.Select(p => p.Name))}) "
+                         + $"VALUES ({string.Join(", ", _GetProperties.Select(p => "@" + p.Name))})";
 
                     await connection.ExecuteAsync(insertQuery, _DynamicParameters);
                 }
@@ -88,21 +85,21 @@ namespace CRUD_Dapper.Repository
                     _DynamicParameters.Add("@" + property.Name, value);
                 }
 
-                //var idProperty = _EntityTypeOf.GetProperty("id");
-                var idProperty = _EntityTypeOf.GetProperty("id") ?? _EntityTypeOf.BaseType.GetProperty("Id");
-                if (idProperty != null)
+                var idProperty = _EntityTypeOf.GetProperty("Id");
+
+                //var idProperty = _EntityTypeOf.GetProperty("Id") ?? _EntityTypeOf.GetProperty("id");
+                if (idProperty != null || idProperty.PropertyType == typeof(int))
                 {
-                    string updateQuery = $@"UPDATE [{_TableName}] 
-                            SET {string.Join(", ", _GetProperties
-                                                    .Where(p => p.Name != "id")
-                                                    .Select(p => p.Name + " = @" + p.Name))} 
-                            WHERE id = @id";
-                    await connection.ExecuteAsync(updateQuery, _DynamicParameters);
+                    string insertQuery = $"INSERT INTO {_TableName} ({string.Join(", ", _GetProperties.Where(p => p.Name != "Id").Select(p => p.Name))}) "
+                    + $"VALUES ({string.Join(", ", _GetProperties.Where(p => p.Name != "Id").Select(p => "@" + p.Name))})";
+
+                    await connection.ExecuteAsync(insertQuery, _DynamicParameters);
                 }
                 else
                 {
                     throw new ArgumentException("Entity must have an 'Id' property.");
                 }
+
             }
         }
         public async Task<T> GetByEmail(string tableName, string email)

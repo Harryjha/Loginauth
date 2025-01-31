@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CRUD_Dapper.Controllers
 {
@@ -16,14 +17,14 @@ namespace CRUD_Dapper.Controllers
             _userRepository = userRepository;
         }
 
-        // Login Page
+        // ✅ Login Page (GET)
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
-        // Handle Login
+        // ✅ Handle Login (POST)
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
@@ -34,23 +35,24 @@ namespace CRUD_Dapper.Controllers
                 return View();
             }
 
-            // Set session
-            HttpContext.Session.SetString("UserId", user.id.ToString());
+            // Store session data
+            HttpContext.Session.SetString("UserId", user.Id.ToString());
             HttpContext.Session.SetString("Email", user.Email);
+            HttpContext.Session.SetString("Role", user.Role); // Store user role
 
             return RedirectToAction("Index", "Home");
         }
 
-        // Register Page
+        // ✅ Register Page (GET)
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
-        // Handle Registration
+        // ✅ Handle Registration (POST)
         [HttpPost]
-        public async Task<IActionResult> Register(string email, string password, string confirmPassword)
+        public async Task<IActionResult> Register(string email, string password, string confirmPassword, string role)
         {
             if (password != confirmPassword)
             {
@@ -69,7 +71,8 @@ namespace CRUD_Dapper.Controllers
             {
                 Email = email,
                 PasswordHash = HashPassword(password),
-                CreatedDate = DateTime.UtcNow,
+                Role = role,  // Owner or Customer
+                CreatedDate = DateTime.UtcNow
             };
 
             await _userRepository.Add("Users", newUser);
@@ -78,14 +81,14 @@ namespace CRUD_Dapper.Controllers
             return RedirectToAction("Login");
         }
 
-        // Logout
+        // ✅ Logout
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
 
-        // Helper: Hash Password
+        // 🔹 Helper: Hash Password
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -95,11 +98,10 @@ namespace CRUD_Dapper.Controllers
             }
         }
 
-        // Helper: Verify Password
+        // 🔹 Helper: Verify Password
         private bool VerifyPassword(string password, string storedHash)
         {
             return HashPassword(password) == storedHash;
         }
     }
 }
-

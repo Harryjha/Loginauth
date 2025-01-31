@@ -1,9 +1,11 @@
 using CRUD_Dapper.Models;
 using CRUD_Dapper.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CRUD_Dapper.Controllers
 {
@@ -23,20 +25,20 @@ namespace CRUD_Dapper.Controllers
             return View();
         }
 
-        // GET: /Home/Destinations
+        // ? GET: Show all destinations for customers
         public async Task<IActionResult> Destinations()
         {
             var destinations = await _destinationRepository.GetAllDestinations();
-            return View(destinations); // Ensure a "Destinations.cshtml" view exists
+            return View(destinations);
         }
 
         // ? GET: Show Create Destination Form
         public IActionResult CreateDestination()
         {
-            return View(); // Ensure "CreateDestination.cshtml" exists
+            return View();
         }
 
-        // ? POST: Submit Form Data
+        // ? POST: Create a new destination (assigning owner)
         [HttpPost]
         public async Task<IActionResult> CreateDestination(Destination model)
         {
@@ -45,19 +47,31 @@ namespace CRUD_Dapper.Controllers
                 return View(model);
             }
 
+            model.OwnerId = GetUserId();
+            model.CreatedDate = DateTime.Now;
+
             await _destinationRepository.AddDestination(model);
-            return RedirectToAction("Destinations"); // Redirect to the list after adding
+            return RedirectToAction("Destinations");
         }
 
-        public IActionResult Privacy()
+        // ? DELETE: Remove Destination (only if owned by the user)
+        [HttpPost]
+        public async Task<IActionResult> DeleteDestination(int id)
         {
-            return View();
+            int userId = GetUserId();
+            var deletedRows = await _destinationRepository.DeleteDestination(id, userId);
+
+            if (deletedRows == 0)
+            {
+                return Unauthorized();
+            }
+
+            return RedirectToAction("Destinations");
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        private int GetUserId()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return int.TryParse(HttpContext.Session.GetString("UserId"), out int userId) ? userId : 0;
         }
     }
 }

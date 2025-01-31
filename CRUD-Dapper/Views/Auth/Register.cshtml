@@ -19,7 +19,14 @@
         <label for="ConfirmPassword">Confirm Password</label>
         <input type="password" name="confirmPassword" class="form-control" required />
     </div>
-    <button type="submit" class="btn btn-success">Register</button>
+    <div class="form-group">
+        <label for="Role">Select Role</label>
+        <select name="role" class="form-control" required>
+            <option value="Customer">Customer</option>
+            <option value="Owner">Owner</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Register</button>
 </form>
 
 <div class="mt-3">

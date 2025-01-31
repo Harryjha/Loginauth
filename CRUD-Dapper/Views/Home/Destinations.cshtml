@@ -1,23 +1,37 @@
-﻿@model IEnumerable<CRUD_Dapper.Models.Destination>
-
-@{
-    ViewData["Title"] = "Available Destinations";
+﻿@{
+    var userRole = Context.Session.GetString("Role");
 }
 
 <div class="container mt-5">
     <h2 class="text-center mb-4">Available Destinations for Booking</h2>
-    <a asp-action="CreateDestination" class="btn btn-success">Add New Destination</a>
+
+    @if (userRole == "Owner")
+    {
+        <div class="text-right mb-3">
+            <a asp-controller="Home" asp-action="CreateDestination" class="btn btn-primary">+ Add New Destination</a>
+        </div>
+    }
 
     <div class="row">
         @foreach (var destination in Model)
         {
-            <div class="col-md-4">
+            <div class="col-md-4 mb-3">
                 <div class="card">
                     <img src="@destination.ImageUrl" class="card-img-top" alt="@destination.Name">
                     <div class="card-body">
                         <h5 class="card-title">@destination.Name</h5>
                         <p class="card-text">@destination.Description</p>
+                        <p class="text-muted">Price: $@destination.Price</p>
                         <a href="#" class="btn btn-success">Book Now</a>
+
+                        @if (userRole == "Owner")
+                        {
+                            <a asp-action="EditDestination" asp-route-id="@destination.Id" class="btn btn-warning">Edit</a>
+                            <form asp-action="DeleteDestination" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@destination.Id" />
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        }
                     </div>
                 </div>
             </div>
