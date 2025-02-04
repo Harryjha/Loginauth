@@ -1,5 +1,9 @@
 ﻿@model CRUD_Dapper.Models.Destination
 
+@{
+    var ownerId = Context.Session.GetString("UserId"); // Get the logged-in Owner ID
+}
+
 <h2>Create Destination</h2>
 
 <form method="post" asp-action="CreateDestination">
@@ -14,6 +18,9 @@
 
     <label>Image URL</label>
     <input type="text" asp-for="ImageUrl" class="form-control" />
+
+    @* Hidden field to pass the OwnerId *@
+    <input type="hidden" asp-for="OwnerId" value="@ownerId" />
 
     <button type="submit" class="btn btn-primary mt-2">Save</button>
 </form>
