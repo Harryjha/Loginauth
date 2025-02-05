@@ -1,9 +1,10 @@
-using CRUD_Dapper.Models;
+﻿using CRUD_Dapper.Models;
 using CRUD_Dapper.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CRUD_Dapper.Controllers
@@ -12,11 +13,13 @@ namespace CRUD_Dapper.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IDestinationRepository _destinationRepository;
+        private readonly IBookingRepository _bookingRepository;
 
-        public HomeController(ILogger<HomeController> logger, IDestinationRepository destinationRepository)
+        public HomeController(ILogger<HomeController> logger, IDestinationRepository destinationRepository, IBookingRepository bookingRepository)
         {
             _logger = logger;
             _destinationRepository = destinationRepository;
+            _bookingRepository = bookingRepository;
         }
 
         public IActionResult Index()
@@ -24,14 +27,14 @@ namespace CRUD_Dapper.Controllers
             return View();
         }
 
-        // ? Show all destinations (accessible to all users)
+        // Show all destinations
         public async Task<IActionResult> Destinations()
         {
             var destinations = await _destinationRepository.GetAllDestinations();
             return View(destinations);
         }
 
-        // ? Show owner-specific destinations
+        // Owner-specific destinations
         public async Task<IActionResult> MyDestinations()
         {
             int userId = GetUserId();
@@ -39,13 +42,13 @@ namespace CRUD_Dapper.Controllers
             return View(destinations);
         }
 
-        // ? Show Create Destination Form
+        // Create Destination (GET)
         public IActionResult CreateDestination()
         {
             return View();
         }
 
-        // ? Create a new destination (assigning owner)
+        // Create Destination (POST)
         [HttpPost]
         public async Task<IActionResult> CreateDestination(Destination model)
         {
@@ -61,7 +64,7 @@ namespace CRUD_Dapper.Controllers
             return RedirectToAction("MyDestinations");
         }
 
-        // ? Edit a destination (GET)
+        // Edit Destination (GET)
         public async Task<IActionResult> EditDestination(int id)
         {
             int userId = GetUserId();
@@ -70,13 +73,13 @@ namespace CRUD_Dapper.Controllers
 
             if (destination == null)
             {
-                return Unauthorized();  // User cannot edit someone else's destination
+                return Unauthorized();
             }
 
             return View(destination);
         }
 
-        // ? Update a destination (POST)
+        // Edit Destination (POST)
         [HttpPost]
         public async Task<IActionResult> EditDestination(Destination model)
         {
@@ -90,13 +93,13 @@ namespace CRUD_Dapper.Controllers
 
             if (result == 0)
             {
-                return Unauthorized();  // User is not authorized to update
+                return Unauthorized();
             }
 
             return RedirectToAction("MyDestinations");
         }
 
-        // ? Delete a destination (only if owned by the user)
+        // Delete Destination
         [HttpPost]
         public async Task<IActionResult> DeleteDestination(int id)
         {
@@ -105,13 +108,58 @@ namespace CRUD_Dapper.Controllers
 
             if (deletedRows == 0)
             {
-                return Unauthorized();  // Prevent unauthorized deletion
+                return Unauthorized();
             }
 
             return RedirectToAction("MyDestinations");
         }
 
-        // ?? Helper: Get the current user ID from session
+        // ✅ Book Destination (GET)
+        public IActionResult BookDestination(int id)
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            ViewBag.DestinationId = id;
+            return View();
+        }
+
+        // ✅ Book Destination (POST)
+        [HttpPost]
+        public async Task<IActionResult> BookDestination(int destinationId, DateTime bookingDate)
+        {
+            int userId = GetUserId();
+            var booking = new Booking
+            {
+                UserId = userId,
+                DestinationId = destinationId,
+                BookingDate = bookingDate
+            };
+
+            await _bookingRepository.AddBooking(booking);
+            return RedirectToAction("MyBookings");
+        }
+
+        // ✅ View Bookings
+        public async Task<IActionResult> MyBookings()
+        {
+            int userId = GetUserId();
+            var bookings = await _bookingRepository.GetUserBookings(userId);
+            return View(bookings);
+        }
+
+        // ✅ Cancel Booking
+        [HttpPost]
+        public async Task<IActionResult> CancelBooking(int bookingId)
+        {
+            int userId = GetUserId();
+            await _bookingRepository.CancelBooking(bookingId, userId);
+            return RedirectToAction("MyBookings");
+        }
+
+        // Helper: Get current user ID
         private int GetUserId()
         {
             return int.TryParse(HttpContext.Session.GetString("UserId"), out int userId) ? userId : 0;

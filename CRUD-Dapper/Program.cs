@@ -3,10 +3,15 @@ using CRUD_Dapper.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ✅ Register Repositories
+builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>(); // ✅ Register Booking Repository
+
+// MVC & Razor Pages
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
-builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
 
+// Session Management
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -15,12 +20,14 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Dependency Injection for Database
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IDapperContext, DapperContext>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 var app = builder.Build();
 
+// Pipeline Configuration
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -30,7 +37,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseSession();
+app.UseSession();  // ✅ Ensure session is enabled
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -38,4 +45,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
 

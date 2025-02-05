@@ -1,0 +1,33 @@
+﻿@model IEnumerable<CRUD_Dapper.Models.Booking>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">My Bookings</h2>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Destination ID</th>
+                <th>Booking Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Model)
+            {
+                <tr>
+                    <td>@booking.Id</td>
+                    <td>@booking.DestinationId</td>
+                    <td>@booking.BookingDate.ToShortDateString()</td>
+                    <td>
+                        <form asp-action="CancelBooking" method="post" style="display:inline;">
+                            <input type="hidden" name="bookingId" value="@booking.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

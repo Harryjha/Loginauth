@@ -1,42 +1,43 @@
 ﻿@model IEnumerable<CRUD_Dapper.Models.Destination>
 
-@{
-    var userRole = Context.Session.GetString("Role");
-    var userId = Context.Session.GetString("UserId"); // Logged-in user's ID
-}
-
-<div class="container mt-5">
-    <h2 class="text-center mb-4">My Destinations</h2>
-
-    @if (userRole == "Owner")
-    {
-        <div class="text-end mb-3">
-            <a asp-controller="Home" asp-action="CreateDestination" class="btn btn-primary">+ Add New Destination</a>
-        </div>
+    @{
+        var userRole = Context.Session.GetString("Role");
+        var userId = Context.Session.GetString("UserId"); // Logged-in user's ID
     }
 
-    <div class="row">
-        @foreach (var destination in Model)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="@destination.ImageUrl" class="card-img-top" alt="@destination.Name" style="height: 200px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">@destination.Name</h5>
-                        <p class="card-text">@destination.Description</p>
-                        <p class="text-muted">Price: $@destination.Price</p>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">My Destinations</h2>
 
-                        @if (userRole == "Owner" && destination.OwnerId.ToString() == userId)
-                        {
-                            <a asp-action="EditDestination" asp-route-id="@destination.Id" class="btn btn-warning btn-sm">Edit</a>
-                            <form asp-action="DeleteDestination" method="post" style="display:inline;">
-                                <input type="hidden" name="id" value="@destination.Id" />
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                        }
-                    </div>
-                </div>
+        @if (userRole == "Owner")
+        {
+            <div class="text-end mb-3">
+                <a asp-controller="Home" asp-action="CreateDestination" class="btn btn-primary">+ Add New Destination</a>
             </div>
         }
+
+        <div class="row">
+            @foreach (var destination in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <img src="@destination.ImageUrl" class="card-img-top" alt="@destination.Name" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">@destination.Name</h5>
+                            <p class="card-text">@destination.Description</p>
+                            <p class="text-muted">Price: $@destination.Price</p>
+
+                            @if (userRole == "Owner" && destination.OwnerId.ToString() == userId)
+                            {
+                                <a asp-action="EditDestination" asp-route-id="@destination.Id" class="btn btn-warning btn-sm">Edit</a>
+                                <form asp-action="DeleteDestination" method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="@destination.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
-</div>
+

@@ -17,14 +17,15 @@ namespace CRUD_Dapper.Controllers
             _userRepository = userRepository;
         }
 
-        // ✅ Login Page (GET)
+        //  Login Page (GET)
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
-        // ✅ Handle Login (POST)
+
+        //  Handle Login (POST)
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
@@ -35,22 +36,31 @@ namespace CRUD_Dapper.Controllers
                 return View();
             }
 
-            // Store session data
+            //  Store session data
             HttpContext.Session.SetString("UserId", user.Id.ToString());
             HttpContext.Session.SetString("Email", user.Email);
             HttpContext.Session.SetString("Role", user.Role); // Store user role
 
-            return RedirectToAction("Index", "Home");
+            //  Redirect based on the user's role
+            if (user.Role == "Owner")
+            {
+                return RedirectToAction("MyDestinations", "Home"); 
+            }
+            else
+            {
+                return RedirectToAction("Destinations", "Home");   
+            }
         }
 
-        // ✅ Register Page (GET)
+
+        //  Register Page (GET)
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
-        // ✅ Handle Registration (POST)
+        //  Handle Registration (POST)
         [HttpPost]
         public async Task<IActionResult> Register(string email, string password, string confirmPassword, string role)
         {
@@ -81,14 +91,14 @@ namespace CRUD_Dapper.Controllers
             return RedirectToAction("Login");
         }
 
-        // ✅ Logout
+        //  Logout
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
 
-        // 🔹 Helper: Hash Password
+        //  Helper: Hash Password
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -98,7 +108,7 @@ namespace CRUD_Dapper.Controllers
             }
         }
 
-        // 🔹 Helper: Verify Password
+        //  Helper: Verify Password
         private bool VerifyPassword(string password, string storedHash)
         {
             return HashPassword(password) == storedHash;

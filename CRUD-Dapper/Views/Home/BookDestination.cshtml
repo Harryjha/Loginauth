@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Book Destination";
+    var destinationId = ViewBag.DestinationId;
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Book Your Destination</h2>
+
+    <form asp-action="BookDestination" method="post">
+        <input type="hidden" name="destinationId" value="@destinationId" />
+
+        <div class="form-group mb-3">
+            <label>Select Date:</label>
+            <input type="date" name="bookingDate" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn btn-success">Confirm Booking</button>
+    </form>
+</div>
