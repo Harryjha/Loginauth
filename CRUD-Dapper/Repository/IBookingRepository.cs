@@ -4,7 +4,7 @@ namespace CRUD_Dapper.Repository
 {
     public interface IBookingRepository
     {
-        Task<IEnumerable<Booking>> GetUserBookings(int userId);  // ✅ Add this
+        Task<IEnumerable<Booking>> GetUserBookings(int userId);  
 
         Task AddBooking(Booking booking);
         Task CancelBooking(int bookingId, int userId);
